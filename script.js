@@ -31,15 +31,17 @@ function addRow() {
     `;
 }
 
-function sumar(e,input,col) {
-    if (e.key === "Enter") {
-        const row = input.closest("tr");
-        const target = row.cells[col].querySelector("input");
-        target.value = Number(target.value) + Number(input.value || 0);
-        input.value = "";
-        actualizarFila(row);
-    }
+function sumar(e, input, col) {
+    // Si hay evento y no es Enter, salir (solo PC)
+    if (e && e.key !== "Enter") return;
+
+    const row = input.closest("tr");
+    const target = row.cells[col].querySelector("input");
+    target.value = Number(target.value) + Number(input.value || 0);
+    input.value = "";
+    actualizarFila(row);
 }
+
 
 function actualizarFila(el) {
     const row = el.closest ? el.closest("tr") : el;
@@ -178,30 +180,3 @@ document.addEventListener("touchend", () => {
     drag = false;
 });
 
-// ==========================
-// Compatibilidad móvil para entradas (flecha/✔)
-// ==========================
-(function(){
-  // Detectar inputs de entrada
-  const inputs = document.querySelectorAll("input[type='number']");
-
-  inputs.forEach(input => {
-    input.addEventListener("change", function(e){
-      // Solo en móvil
-      if(window.innerWidth > 768) return;
-
-      // Averiguar la columna: 3=Etiquetado, 5=Sin etiquetar
-      const row = input.closest("tr");
-      const col = row.cells[3].querySelector("input") === input ? 3 :
-                  row.cells[5].querySelector("input") === input ? 5 : null;
-
-      // Si no coincide, buscar el onkeydown
-      let targetCol = col;
-      if(targetCol === null){
-        targetCol = input.getAttribute("onkeydown")?.includes("'e'") ? 3 : 5;
-      }
-
-      sumar({key:"Enter"}, input, targetCol); // simula Enter
-    });
-  });
-})();
