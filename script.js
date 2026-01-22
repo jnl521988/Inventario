@@ -179,24 +179,29 @@ document.addEventListener("touchend", () => {
 });
 
 // ==========================
-// Compatibilidad móvil: sumar con la flecha / ✔ del teclado
+// Compatibilidad móvil para entradas (flecha/✔)
 // ==========================
 (function(){
-  // Solo en pantallas móviles (ajusta el ancho según necesites)
-  if(window.innerWidth <= 768){
-    // Seleccionamos todos los inputs numéricos de entradas
-    const inputs = document.querySelectorAll("input[type='number'][onkeydown]");
+  // Detectar inputs de entrada
+  const inputs = document.querySelectorAll("input[type='number']");
 
-    inputs.forEach(input => {
-      input.addEventListener("change", function(){
-        // Detectamos si es Etiquetado o Sin etiquetar
-        const tipo = input.getAttribute("onkeydown").includes("'e'") ? 'e' : 's';
+  inputs.forEach(input => {
+    input.addEventListener("change", function(e){
+      // Solo en móvil
+      if(window.innerWidth > 768) return;
 
-        // Creamos un evento simulado de Enter
-        const e = new KeyboardEvent("keydown", {key: "Enter"});
-        // Llamamos a tu función existente
-        entrada(e, input, tipo);
-      });
+      // Averiguar la columna: 3=Etiquetado, 5=Sin etiquetar
+      const row = input.closest("tr");
+      const col = row.cells[3].querySelector("input") === input ? 3 :
+                  row.cells[5].querySelector("input") === input ? 5 : null;
+
+      // Si no coincide, buscar el onkeydown
+      let targetCol = col;
+      if(targetCol === null){
+        targetCol = input.getAttribute("onkeydown")?.includes("'e'") ? 3 : 5;
+      }
+
+      sumar({key:"Enter"}, input, targetCol); // simula Enter
     });
-  }
+  });
 })();
