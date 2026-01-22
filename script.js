@@ -157,3 +157,25 @@ function clearCalc() {
     calcValue = "";
     document.getElementById("calc-display").value = "";
 }
+// ==========================
+// Compatibilidad móvil: sumar con la flecha / ✔ del teclado
+// ==========================
+(function(){
+  // Solo en pantallas móviles (ajusta el ancho según necesites)
+  if(window.innerWidth <= 768){
+    // Seleccionamos todos los inputs numéricos de entradas
+    const inputs = document.querySelectorAll("input[type='number'][onkeydown]");
+
+    inputs.forEach(input => {
+      input.addEventListener("change", function(){
+        // Detectamos si es Etiquetado o Sin etiquetar
+        const tipo = input.getAttribute("onkeydown").includes("'e'") ? 'e' : 's';
+
+        // Creamos un evento simulado de Enter
+        const e = new KeyboardEvent("keydown", {key: "Enter"});
+        // Llamamos a tu función existente
+        entrada(e, input, tipo);
+      });
+    });
+  }
+})();
