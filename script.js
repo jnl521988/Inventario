@@ -157,6 +157,27 @@ function clearCalc() {
     calcValue = "";
     document.getElementById("calc-display").value = "";
 }
+// ====== Soporte arrastre móvil ======
+header.addEventListener("touchstart", e => {
+    drag = true;
+    const touch = e.touches[0];
+    ox = touch.clientX - calc.offsetLeft;
+    oy = touch.clientY - calc.offsetTop;
+}, {passive: false});
+
+document.addEventListener("touchmove", e => {
+    if (drag) {
+        const touch = e.touches[0];
+        calc.style.left = (touch.clientX - ox) + "px";
+        calc.style.top = (touch.clientY - oy) + "px";
+        e.preventDefault(); // evita scroll mientras arrastras
+    }
+}, {passive: false});
+
+document.addEventListener("touchend", () => {
+    drag = false;
+});
+
 // ==========================
 // Compatibilidad móvil: sumar con la flecha / ✔ del teclado
 // ==========================
