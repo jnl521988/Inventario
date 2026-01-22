@@ -31,17 +31,15 @@ function addRow() {
     `;
 }
 
-function sumar(e, input, col) {
-    // Si hay evento y no es Enter, salir (solo PC)
-    if (e && e.key !== "Enter") return;
-
-    const row = input.closest("tr");
-    const target = row.cells[col].querySelector("input");
-    target.value = Number(target.value) + Number(input.value || 0);
-    input.value = "";
-    actualizarFila(row);
+function sumar(e,input,col) {
+    if (e.key === "Enter") {
+        const row = input.closest("tr");
+        const target = row.cells[col].querySelector("input");
+        target.value = Number(target.value) + Number(input.value || 0);
+        input.value = "";
+        actualizarFila(row);
+    }
 }
-
 
 function actualizarFila(el) {
     const row = el.closest ? el.closest("tr") : el;
@@ -179,4 +177,28 @@ document.addEventListener("touchmove", e => {
 document.addEventListener("touchend", () => {
     drag = false;
 });
+
+// ============================
+// Compatibilidad móvil: flecha / ✔
+// ============================
+(function() {
+  const inputs = document.querySelectorAll("input[type='number']");
+
+  inputs.forEach(input => {
+    // Detectar cambios de valor
+    input.addEventListener("keyup", function(e) {
+      // Solo en móvil
+      if (window.innerWidth > 768) return;
+
+      // Algunos teclados móviles envían key "Enter" al presionar ✔
+      // Algunos no envían nada, por eso usamos keyCode 13 o verificamos cambio
+      if (e.key === "Enter" || e.keyCode === 13) {
+        // Averiguamos la columna: 3=Etiquetado, 5=Sin etiquetar
+        const row = input.closest("tr");
+        const col = input.getAttribute("onkeydown")?.includes("'e'") ? 3 : 5;
+        sumar({key:"Enter"}, input, col);
+      }
+    });
+  });
+})();
 
