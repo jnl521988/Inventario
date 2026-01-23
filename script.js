@@ -1,5 +1,3 @@
-let lastFocusedInput = null;
-
 const marcas = [
     "Divina Proporción","Platón","Abracadabra","Madremia","24 Mozas",
     "Loquillo Tinto","Encomienda de la Vega","Vocablos",
@@ -15,7 +13,7 @@ function addRow() {
 
     row.innerHTML = `
         <td>
-            <select>${marcas.map(m=>`<option>${m}</option>`).join("")}</select>
+            <select>${marcas.map(m => `<option>${m}</option>`).join("")}</select>
         </td>
 
         <td><input type="number"></td>
@@ -55,18 +53,10 @@ function addRow() {
     `;
 }
 
-
-function sumar(e,input,col) {
-    if (e.key === "Enter") {
-        const row = input.closest("tr");
-        const target = row.cells[col].querySelector("input");
-        target.value = Number(target.value) + Number(input.value || 0);
-        input.value = "";
-        actualizarFila(row);
-    }
-}
-function sumarBlur(input, col) {
-    if (window.innerWidth > 768) return; // solo móvil
+/* ====== SUMAS ====== */
+// PC → ENTER
+function sumar(e, input, col) {
+    if (e.key !== "Enter") return;
 
     const valor = Number(input.value || 0);
     if (valor <= 0) return;
@@ -79,6 +69,18 @@ function sumarBlur(input, col) {
     actualizarFila(row);
 }
 
+// MÓVIL → ✔️ / flecha / perder foco
+function sumarBlur(input, col) {
+    const valor = Number(input.value || 0);
+    if (valor <= 0) return;
+
+    const row = input.closest("tr");
+    const target = row.cells[col].querySelector("input");
+
+    target.value = Number(target.value) + valor;
+    input.value = "";
+    actualizarFila(row);
+}
 
 function actualizarFila(el) {
     const row = el.closest ? el.closest("tr") : el;
@@ -93,7 +95,7 @@ function actualizarFila(el) {
 /* ====== RESUMEN ====== */
 function enviarResumen() {
     resumenData = [];
-    document.querySelectorAll("#inventoryTable tbody tr").forEach(r=>{
+    document.querySelectorAll("#inventoryTable tbody tr").forEach(r => {
         resumenData.push({
             marca: r.cells[0].querySelector("select").value,
             añada: r.cells[1].querySelector("input").value,
@@ -113,7 +115,7 @@ function cargarResumen() {
 
     let totalB = 0, totalL = 0;
 
-    resumenData.forEach(d=>{
+    resumenData.forEach(d => {
         const r = tbody.insertRow();
         r.innerHTML = `
             <td>${d.marca}</td>
@@ -133,48 +135,67 @@ function cargarResumen() {
 }
 
 /* ====== NAVEGACIÓN ====== */
-function mostrarResumen(){
-    document.getElementById("paginaPrincipal").style.display="none";
-    document.getElementById("paginaResumen").style.display="block";
+function mostrarResumen() {
+    document.getElementById("paginaPrincipal").style.display = "none";
+    document.getElementById("paginaResumen").style.display = "block";
 }
 
-function volverPrincipal(){
-    document.getElementById("paginaResumen").style.display="none";
-    document.getElementById("paginaPrincipal").style.display="block";
+function volverPrincipal() {
+    document.getElementById("paginaResumen").style.display = "none";
+    document.getElementById("paginaPrincipal").style.display = "block";
 }
 
-function borrarResumen(){
-    resumenData=[];
+function borrarResumen() {
+    resumenData = [];
     cargarResumen();
 }
 
-function exportarPDF(){
+function exportarPDF() {
     window.print();
 }
 
 /* ====== CALCULADORA ====== */
-function toggleCalculator(){
-    const c=document.getElementById("calculator");
-    c.style.display=c.style.display==="none"?"block":"none";
+function toggleCalculator() {
+    const c = document.getElementById("calculator");
+    c.style.display = c.style.display === "none" ? "block" : "none";
 }
 
-/* Arrastrar */
-const calc=document.getElementById("calculator");
-const header=document.getElementById("calc-header");
-let drag=false,ox,oy;
+const calc = document.getElementById("calculator");
+const header = document.getElementById("calc-header");
+let drag = false, ox = 0, oy = 0;
 
-header.addEventListener("mousedown",e=>{
-    drag=true;
-    ox=e.clientX-calc.offsetLeft;
-    oy=e.clientY-calc.offsetTop;
+header.addEventListener("mousedown", e => {
+    drag = true;
+    ox = e.clientX - calc.offsetLeft;
+    oy = e.clientY - calc.offsetTop;
 });
-document.addEventListener("mousemove",e=>{
-    if(drag){
-        calc.style.left=e.clientX-ox+"px";
-        calc.style.top=e.clientY-oy+"px";
-    }
+
+document.addEventListener("mousemove", e => {
+    if (!drag) return;
+    calc.style.left = (e.clientX - ox) + "px";
+    calc.style.top = (e.clientY - oy) + "px";
 });
-document.addEventListener("mouseup",()=>drag=false);
+
+document.addEventListener("mouseup", () => drag = false);
+
+// Móvil
+header.addEventListener("touchstart", e => {
+    drag = true;
+    const t = e.touches[0];
+    ox = t.clientX - calc.offsetLeft;
+    oy = t.clientY - calc.offsetTop;
+}, { passive: false });
+
+document.addEventListener("touchmove", e => {
+    if (!drag) return;
+    const t = e.touches[0];
+    calc.style.left = (t.clientX - ox) + "px";
+    calc.style.top = (t.clientY - oy) + "px";
+    e.preventDefault();
+}, { passive: false });
+
+document.addEventListener("touchend", () => drag = false);
+
 let calcValue = "";
 
 function press(val) {
@@ -187,73 +208,12 @@ function calculate() {
         calcValue = eval(calcValue).toString();
         document.getElementById("calc-display").value = calcValue;
     } catch {
-        document.getElementById("calc-display").value = "Error";
         calcValue = "";
+        document.getElementById("calc-display").value = "Error";
     }
 }
 
 function clearCalc() {
     calcValue = "";
     document.getElementById("calc-display").value = "";
-}
-// ====== Soporte arrastre móvil ======
-header.addEventListener("touchstart", e => {
-    drag = true;
-    const touch = e.touches[0];
-    ox = touch.clientX - calc.offsetLeft;
-    oy = touch.clientY - calc.offsetTop;
-}, {passive: false});
-
-document.addEventListener("touchmove", e => {
-    if (drag) {
-        const touch = e.touches[0];
-        calc.style.left = (touch.clientX - ox) + "px";
-        calc.style.top = (touch.clientY - oy) + "px";
-        e.preventDefault(); // evita scroll mientras arrastras
-    }
-}, {passive: false});
-
-document.addEventListener("touchend", () => {
-    drag = false;
-});
-
-// ============================
-// ENTER PC + FLECHA / ✔ MÓVIL
-// ============================
-document.getElementById("inventoryForm").addEventListener("submit", function(e) {
-    e.preventDefault();
-
-    const input = lastFocusedInput;
-    if (!input) return;
-
-    const row = input.closest("tr");
-    if (!row) return;
-
-    const cellIndex = input.parentElement.cellIndex;
-
-    if (cellIndex === 2) {
-        sumar({ key: "Enter" }, input, 3);
-    }
-
-    if (cellIndex === 4) {
-        sumar({ key: "Enter" }, input, 5);
-    }
-});
-
-
-// ====== Submit oculto para móviles ======
-(function () {
-    const form = document.getElementById("inventoryForm");
-    if (!form) return;
-
-    // Crear botón submit invisible
-    const hiddenSubmit = document.createElement("button");
-    hiddenSubmit.type = "submit";
-    hiddenSubmit.style.display = "none";
-    form.appendChild(hiddenSubmit);
-})();
-document.addEventListener("focusin", e => {
-    if (e.target.tagName === "INPUT" && e.target.type === "number") {
-        lastFocusedInput = e.target;
-    }
-});
+                            }
