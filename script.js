@@ -1,3 +1,5 @@
+let lastFocusedInput = null;
+
 const marcas = [
     "Divina Proporción","Platón","Abracadabra","Madremia","24 Mozas",
     "Loquillo Tinto","Encomienda de la Vega","Vocablos",
@@ -182,26 +184,25 @@ document.addEventListener("touchend", () => {
 // ENTER PC + FLECHA / ✔ MÓVIL
 // ============================
 document.getElementById("inventoryForm").addEventListener("submit", function(e) {
-    e.preventDefault(); // evita recargar la página
+    e.preventDefault();
 
-    const input = document.activeElement;
-    if (!input || input.tagName !== "INPUT" || input.type !== "number") return;
+    const input = lastFocusedInput;
+    if (!input) return;
 
     const row = input.closest("tr");
     if (!row) return;
 
     const cellIndex = input.parentElement.cellIndex;
 
-    // Entrada Etiquetado → suma a columna 3
     if (cellIndex === 2) {
         sumar({ key: "Enter" }, input, 3);
     }
 
-    // Entrada Sin Etiquetar → suma a columna 5
     if (cellIndex === 4) {
         sumar({ key: "Enter" }, input, 5);
     }
 });
+
 
 // ====== Submit oculto para móviles ======
 (function () {
@@ -214,3 +215,8 @@ document.getElementById("inventoryForm").addEventListener("submit", function(e) 
     hiddenSubmit.style.display = "none";
     form.appendChild(hiddenSubmit);
 })();
+document.addEventListener("focusin", e => {
+    if (e.target.tagName === "INPUT" && e.target.type === "number") {
+        lastFocusedInput = e.target;
+    }
+});
