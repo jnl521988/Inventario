@@ -179,23 +179,38 @@ document.addEventListener("touchend", () => {
 });
 
 // ============================
-// Detectar Enter (PC) o flecha ✔ (móvil)
+// ENTER PC + FLECHA / ✔ MÓVIL
 // ============================
-const form = document.getElementById("inventoryForm");
+document.getElementById("inventoryForm").addEventListener("submit", function(e) {
+    e.preventDefault(); // evita recargar la página
 
-form.addEventListener("submit", function(e) {
-    e.preventDefault(); // evitar recarga de página
-
-    // Detecta el input activo
     const input = document.activeElement;
+    if (!input || input.tagName !== "INPUT" || input.type !== "number") return;
 
-    // Solo si es un input numérico de entradas
-    if(input.tagName === "INPUT" && input.type === "number") {
-        // Determinar columna: Etiquetado (3) o Sin etiquetar (5)
-        const col = input.getAttribute("onkeydown")?.includes("'e'") ? 3 : 5;
+    const row = input.closest("tr");
+    if (!row) return;
 
-        // Llamamos a la función sumar simulando Enter
-        sumar({key: "Enter"}, input, col);
+    const cellIndex = input.parentElement.cellIndex;
+
+    // Entrada Etiquetado → suma a columna 3
+    if (cellIndex === 2) {
+        sumar({ key: "Enter" }, input, 3);
+    }
+
+    // Entrada Sin Etiquetar → suma a columna 5
+    if (cellIndex === 4) {
+        sumar({ key: "Enter" }, input, 5);
     }
 });
 
+// ====== Submit oculto para móviles ======
+(function () {
+    const form = document.getElementById("inventoryForm");
+    if (!form) return;
+
+    // Crear botón submit invisible
+    const hiddenSubmit = document.createElement("button");
+    hiddenSubmit.type = "submit";
+    hiddenSubmit.style.display = "none";
+    form.appendChild(hiddenSubmit);
+})();
