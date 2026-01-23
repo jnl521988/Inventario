@@ -179,26 +179,23 @@ document.addEventListener("touchend", () => {
 });
 
 // ============================
-// Compatibilidad móvil: flecha / ✔
+// Detectar Enter (PC) o flecha ✔ (móvil)
 // ============================
-(function() {
-  const inputs = document.querySelectorAll("input[type='number']");
+const form = document.getElementById("inventoryForm");
 
-  inputs.forEach(input => {
-    // Detectar cambios de valor
-    input.addEventListener("keyup", function(e) {
-      // Solo en móvil
-      if (window.innerWidth > 768) return;
+form.addEventListener("submit", function(e) {
+    e.preventDefault(); // evitar recarga de página
 
-      // Algunos teclados móviles envían key "Enter" al presionar ✔
-      // Algunos no envían nada, por eso usamos keyCode 13 o verificamos cambio
-      if (e.key === "Enter" || e.keyCode === 13) {
-        // Averiguamos la columna: 3=Etiquetado, 5=Sin etiquetar
-        const row = input.closest("tr");
+    // Detecta el input activo
+    const input = document.activeElement;
+
+    // Solo si es un input numérico de entradas
+    if(input.tagName === "INPUT" && input.type === "number") {
+        // Determinar columna: Etiquetado (3) o Sin etiquetar (5)
         const col = input.getAttribute("onkeydown")?.includes("'e'") ? 3 : 5;
-        sumar({key:"Enter"}, input, col);
-      }
-    });
-  });
-})();
+
+        // Llamamos a la función sumar simulando Enter
+        sumar({key: "Enter"}, input, col);
+    }
+});
 
