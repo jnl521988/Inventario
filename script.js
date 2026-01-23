@@ -14,12 +14,30 @@ function addRow() {
     const row = tbody.insertRow();
 
     row.innerHTML = `
-        <td><select>${marcas.map(m=>`<option>${m}</option>`).join("")}</select></td>
+        <td>
+            <select>${marcas.map(m=>`<option>${m}</option>`).join("")}</select>
+        </td>
+
         <td><input type="number"></td>
-        <td><input type="number" onkeydown="sumar(event,this,3)"></td>
+
+        <!-- Entrada Etiquetado -->
+        <td>
+            <input type="number"
+                   onkeydown="sumar(event,this,3)"
+                   onblur="sumarBlur(this,3)">
+        </td>
+
         <td><input type="number" value="0" readonly></td>
-        <td><input type="number" onkeydown="sumar(event,this,5)"></td>
+
+        <!-- Entrada Sin Etiquetar -->
+        <td>
+            <input type="number"
+                   onkeydown="sumar(event,this,5)"
+                   onblur="sumarBlur(this,5)">
+        </td>
+
         <td><input type="number" value="0" readonly></td>
+
         <td>
             <select onchange="actualizarFila(this)">
                 <option value="0.5">0.5</option>
@@ -27,11 +45,16 @@ function addRow() {
                 <option value="1.5">1.5</option>
             </select>
         </td>
+
         <td>0</td>
         <td>0</td>
-        <td><button onclick="this.closest('tr').remove()">❌</button></td>
+
+        <td>
+            <button onclick="this.closest('tr').remove()">❌</button>
+        </td>
     `;
 }
+
 
 function sumar(e,input,col) {
     if (e.key === "Enter") {
@@ -42,6 +65,20 @@ function sumar(e,input,col) {
         actualizarFila(row);
     }
 }
+function sumarBlur(input, col) {
+    if (window.innerWidth > 768) return; // solo móvil
+
+    const valor = Number(input.value || 0);
+    if (valor <= 0) return;
+
+    const row = input.closest("tr");
+    const target = row.cells[col].querySelector("input");
+
+    target.value = Number(target.value) + valor;
+    input.value = "";
+    actualizarFila(row);
+}
+
 
 function actualizarFila(el) {
     const row = el.closest ? el.closest("tr") : el;
