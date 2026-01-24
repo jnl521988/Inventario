@@ -7,44 +7,58 @@ const marcas = [
 let resumenData = [];
 
 /* ====== INVENTARIO ====== */
-function addRow() {
+// Cargar inventario guardado al iniciar
+document.addEventListener("DOMContentLoaded", () => {
+    const saved = localStorage.getItem("inventarioBodega");
+    if (saved) {
+        const rows = JSON.parse(saved);
+        rows.forEach(r => addRow(r));
+    }
+});
+
+// addRow acepta un objeto opcional para rellenar valores
+function addRow(data = {}) {
     const tbody = document.querySelector("#inventoryTable tbody");
     const row = tbody.insertRow();
 
     row.innerHTML = `
         <td><input type="checkbox" class="selectRow"></td>
         <td>
-            <select>${marcas.map(m => `<option>${m}</option>`).join("")}</select>
+            <select>${marcas.map(m => `<option ${data.marca === m ? "selected" : ""}>${m}</option>`).join("")}</select>
         </td>
-        <td><input type="number"></td>
+        <td><input type="number" value="${data.añada || ''}"></td>
 
         <!-- Entrada Etiquetado -->
         <td>
             <input type="number" onkeydown="sumar(event,this,4)" onblur="sumarBlur(this,4)">
         </td>
-        <td><input type="number" value="0" readonly></td>
+        <td><input type="number" value="${data.et || 0}" readonly></td>
 
         <!-- Entrada Sin Etiquetar -->
         <td>
             <input type="number" onkeydown="sumar(event,this,6)" onblur="sumarBlur(this,6)">
         </td>
-        <td><input type="number" value="0" readonly></td>
+        <td><input type="number" value="${data.sin || 0}" readonly></td>
 
         <td>
             <select onchange="actualizarFila(this)">
-                <option value="0.5">0.5</option>
-                <option value="0.75" selected>0.75</option>
-                <option value="1.5">1.5</option>
+                <option value="0.5" ${data.cap == 0.5 ? "selected" : ""}>0.5</option>
+                <option value="0.75" ${data.cap == 0.75 || !data.cap ? "selected" : ""}>0.75</option>
+                <option value="1.5" ${data.cap == 1.5 ? "selected" : ""}>1.5</option>
             </select>
         </td>
 
-        <td>0</td>
-        <td>0</td>
+        <td>${data.bot || 0}</td>
+        <td>${data.lit || 0}</td>
 
         <td>
-            <button onclick="this.closest('tr').remove()">❌</button>
+            <button onclick="this.closest('tr').remove(); saveInventory()">❌</button>
         </td>
     `;
+
+    actualizarFila(row);
+    // Guardar inventario después de añadir fila
+    saveInventory();
 }
 
 /* ====== SUMAS ====== */
@@ -60,6 +74,7 @@ function sumar(e, input, col) {
         target.value = Number(target.value) + valor;
         input.value = "";
         actualizarFila(row);
+        saveInventory();
     }
 }
 
@@ -73,6 +88,7 @@ function sumarBlur(input, col) {
     target.value = Number(target.value) + valor;
     input.value = "";
     actualizarFila(row);
+    saveInventory();
 }
 
 /* ====== ACTUALIZAR FILA ====== */
@@ -84,6 +100,24 @@ function actualizarFila(el) {
 
     row.cells[8].innerText = et + sin; // Total botellas
     row.cells[9].innerText = ((et + sin) * cap).toFixed(0); // Total litros
+    saveInventory();
+}
+
+/* ====== GUARDADO EN LOCALSTORAGE ====== */
+function saveInventory() {
+    const data = [];
+    document.querySelectorAll("#inventoryTable tbody tr").forEach(r => {
+        data.push({
+            marca: r.cells[1].querySelector("select").value,
+            añada: r.cells[2].querySelector("input").value,
+            et: r.cells[4].querySelector("input").value,
+            sin: r.cells[6].querySelector("input").value,
+            cap: Number(r.cells[7].querySelector("select").value),
+            bot: r.cells[8].innerText,
+            lit: r.cells[9].innerText
+        });
+    });
+    localStorage.setItem("inventarioBodega", JSON.stringify(data));
 }
 
 /* ====== RESUMEN ====== */
@@ -159,6 +193,7 @@ function resetFilasSeleccionadas() {
             checkbox.checked = false;
         }
     });
+    saveInventory();
 }
 
 function toggleSelectAll(master) {

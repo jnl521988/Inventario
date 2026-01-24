@@ -195,6 +195,12 @@ input:focus, select:focus {
 #paginaResumen button:nth-of-type(3){
   background: linear-gradient(135deg, #6dc471, #66bb6a);
 }
+@media print {
+    #paginaResumen button {
+        display: none !important; /* Oculta solo los botones del resumen al imprimir */
+    }
+}
+
 
 /* Hover elegante */
 #paginaResumen button:hover{
