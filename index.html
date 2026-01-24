@@ -16,10 +16,13 @@
     <button onclick="enviarResumen()">📤 Enviar a resumen</button>
     <button onclick="mostrarResumen()">📊 Ir a resumen</button>
     <button onclick="toggleCalculator()">🧮 Calculadora</button>
+    <button onclick="resetFilasSeleccionadas()">♻ Reset filas seleccionadas</button>
+
 
     <form id="inventoryForm">
   <table id="inventoryTable">
     <thead><tr>
+                <th><input type="checkbox" id="selectAll" onchange="toggleSelectAll(this)"></th>
                 <th>Marca</th>
                 <th>Añada</th>
                 <th>Entrada Etiquetado</th>

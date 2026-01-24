@@ -206,3 +206,21 @@ input:focus, select:focus {
 #paginaResumen button:active{
   transform: scale(0.97);
 }
+.fila-activa {
+    background: #e0f2ff;
+    outline: 2px solid #2196f3;
+}
+/* Botón Reset en la página principal */
+#paginaPrincipal button:nth-of-type(5) {
+    background: linear-gradient(135deg, #e43c3c, #cd3e3e); /* degradado naranja */
+    color: white;
+}
+
+#paginaPrincipal button:nth-of-type(5):hover {
+    filter: brightness(1.2);
+    transform: translateY(-1px);
+}
+
+#paginaPrincipal button:nth-of-type(5):active {
+    transform: scale(0.97);
+}

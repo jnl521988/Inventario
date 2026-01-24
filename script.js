@@ -12,28 +12,22 @@ function addRow() {
     const row = tbody.insertRow();
 
     row.innerHTML = `
+        <td><input type="checkbox" class="selectRow"></td>
         <td>
             <select>${marcas.map(m => `<option>${m}</option>`).join("")}</select>
         </td>
-
         <td><input type="number"></td>
 
         <!-- Entrada Etiquetado -->
         <td>
-            <input type="number"
-                   onkeydown="sumar(event,this,3)"
-                   onblur="sumarBlur(this,3)">
+            <input type="number" onkeydown="sumar(event,this,4)" onblur="sumarBlur(this,4)">
         </td>
-
         <td><input type="number" value="0" readonly></td>
 
         <!-- Entrada Sin Etiquetar -->
         <td>
-            <input type="number"
-                   onkeydown="sumar(event,this,5)"
-                   onblur="sumarBlur(this,5)">
+            <input type="number" onkeydown="sumar(event,this,6)" onblur="sumarBlur(this,6)">
         </td>
-
         <td><input type="number" value="0" readonly></td>
 
         <td>
@@ -54,22 +48,21 @@ function addRow() {
 }
 
 /* ====== SUMAS ====== */
-// PC → ENTER
 function sumar(e, input, col) {
-    if (e.key !== "Enter") return;
+    if (e.key === "Enter") {
+        e.preventDefault();
+        const valor = Number(input.value || 0);
+        if (valor <= 0) return;
 
-    const valor = Number(input.value || 0);
-    if (valor <= 0) return;
+        const row = input.closest("tr");
+        const target = row.cells[col].querySelector("input");
 
-    const row = input.closest("tr");
-    const target = row.cells[col].querySelector("input");
-
-    target.value = Number(target.value) + valor;
-    input.value = "";
-    actualizarFila(row);
+        target.value = Number(target.value) + valor;
+        input.value = "";
+        actualizarFila(row);
+    }
 }
 
-// MÓVIL → ✔️ / flecha / perder foco
 function sumarBlur(input, col) {
     const valor = Number(input.value || 0);
     if (valor <= 0) return;
@@ -82,14 +75,15 @@ function sumarBlur(input, col) {
     actualizarFila(row);
 }
 
+/* ====== ACTUALIZAR FILA ====== */
 function actualizarFila(el) {
     const row = el.closest ? el.closest("tr") : el;
-    const et = Number(row.cells[3].querySelector("input").value);
-    const sin = Number(row.cells[5].querySelector("input").value);
-    const cap = Number(row.cells[6].querySelector("select").value);
+    const et = Number(row.cells[4].querySelector("input").value);
+    const sin = Number(row.cells[6].querySelector("input").value);
+    const cap = Number(row.cells[7].querySelector("select").value);
 
-    row.cells[7].innerText = et + sin;
-    row.cells[8].innerText = ((et + sin) * cap).toFixed(0);
+    row.cells[8].innerText = et + sin; // Total botellas
+    row.cells[9].innerText = ((et + sin) * cap).toFixed(0); // Total litros
 }
 
 /* ====== RESUMEN ====== */
@@ -97,13 +91,13 @@ function enviarResumen() {
     resumenData = [];
     document.querySelectorAll("#inventoryTable tbody tr").forEach(r => {
         resumenData.push({
-            marca: r.cells[0].querySelector("select").value,
-            añada: r.cells[1].querySelector("input").value,
-            et: r.cells[3].querySelector("input").value,
-            sin: r.cells[5].querySelector("input").value,
-            cap: r.cells[6].querySelector("select").value,
-            bot: r.cells[7].innerText,
-            lit: r.cells[8].innerText
+            marca: r.cells[1].querySelector("select").value,   // Marca
+            añada: r.cells[2].querySelector("input").value,     // Añada
+            et: r.cells[4].querySelector("input").value,        // Etiquetado
+            sin: r.cells[6].querySelector("input").value,       // Sin Etiquetar
+            cap: r.cells[7].querySelector("select").value,      // Capacidad
+            bot: r.cells[8].innerText,                          // Total Botellas
+            lit: r.cells[9].innerText                           // Total Litros
         });
     });
     cargarResumen();
@@ -154,6 +148,23 @@ function exportarPDF() {
     window.print();
 }
 
+/* ====== RESET FILAS SELECCIONADAS ====== */
+function resetFilasSeleccionadas() {
+    document.querySelectorAll("#inventoryTable tbody tr").forEach(row => {
+        const checkbox = row.querySelector(".selectRow");
+        if (checkbox && checkbox.checked) {
+            row.cells[4].querySelector("input").value = "0"; // Etiquetado
+            row.cells[6].querySelector("input").value = "0"; // Sin etiquetar
+            actualizarFila(row);
+            checkbox.checked = false;
+        }
+    });
+}
+
+function toggleSelectAll(master) {
+    document.querySelectorAll(".selectRow").forEach(cb => cb.checked = master.checked);
+}
+
 /* ====== CALCULADORA ====== */
 function toggleCalculator() {
     const c = document.getElementById("calculator");
@@ -178,7 +189,6 @@ document.addEventListener("mousemove", e => {
 
 document.addEventListener("mouseup", () => drag = false);
 
-// Móvil
 header.addEventListener("touchstart", e => {
     drag = true;
     const t = e.touches[0];
@@ -216,4 +226,4 @@ function calculate() {
 function clearCalc() {
     calcValue = "";
     document.getElementById("calc-display").value = "";
-                            }
+}
