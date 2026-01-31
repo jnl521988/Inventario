@@ -230,3 +230,57 @@ input:focus, select:focus {
 #paginaPrincipal button:nth-of-type(5):active {
     transform: scale(0.97);
 }
+/* Título del histórico */
+#historicoEntradasTitulo {
+    display: inline-block;
+    background: linear-gradient(135deg, #17828e, #1a9292);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 8px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    margin-bottom: 8px;
+}
+
+/* Contenedor del histórico */
+#historicoEntradas {
+    margin-top: 20px;
+    background: #fff8dc; /* color crema suave */
+    padding: 15px;
+    border-radius: 10px;
+    border: 2px solid #f0c36d; /* borde dorado */
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+/* Cada fila dentro del histórico */
+.historico-fila {
+    background: #fff3b0; /* amarillo pálido para destacar */
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+}
+
+/* Título de la marca + añada */
+.historico-titulo {
+    font-weight: bold;
+    margin-bottom: 6px;
+    color: #d35400; /* naranja oscuro */
+}
+
+/* Columnas de Etiquetado y Sin Etiquetar */
+.historico-contenido {
+    display: flex;
+    gap: 20px;
+}
+.historico-col {
+    flex: 1;
+}
+.historico-antiguo {
+    color: #888;
+    margin-right: 6px;
+}
+.historico-nuevo {
+    color: #333;
+    font-weight: 500;
+}

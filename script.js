@@ -52,7 +52,7 @@ function addRow(data = {}) {
         <td>${data.lit || 0}</td>
 
         <td>
-            <button onclick="this.closest('tr').remove(); saveInventory()">❌</button>
+            <button onclick="eliminarFila(this.closest('tr'))">❌</button>
         </td>
     `;
 
@@ -262,3 +262,150 @@ function clearCalc() {
     calcValue = "";
     document.getElementById("calc-display").value = "";
 }
+/* ====== HISTÓRICO DE ENTRADAS ====== */
+let historico = {}; // Guardará los historicos por fila: {idFila: {prevEt: [], prevSin: [], et: [], sin: []}}
+
+function actualizarHistorico(row, valor, tipo) {
+    // Crear ID único para cada fila
+    const rowId = row.dataset.id || (row.dataset.id = Date.now() + Math.random());
+
+    // Inicializar si no existe
+    if (!historico[rowId]) historico[rowId] = { prevEt: [], prevSin: [], et: [], sin: [] };
+
+    if (tipo === 'et') historico[rowId].et.push(valor);
+    else if (tipo === 'sin') historico[rowId].sin.push(valor);
+
+    renderHistorico();
+}
+
+function renderHistorico() {
+    const cont = document.getElementById("historicoEntradas");
+    if (!cont) return; // Si no existe el contenedor, salir
+
+    cont.innerHTML = "";
+
+    document.querySelectorAll("#inventoryTable tbody tr").forEach(row => {
+        const rowId = row.dataset.id;
+        if (!rowId || !historico[rowId]) return;
+
+        const marca = row.cells[1].querySelector("select").value;
+        const añada = row.cells[2].querySelector("input").value;
+
+        const prevEt = historico[rowId].prevEt || [];
+        const prevSin = historico[rowId].prevSin || [];
+        const newEt = historico[rowId].et || [];
+        const newSin = historico[rowId].sin || [];
+
+        const etEntradas = (prevEt.length ? `(${prevEt.join(", ")})` : "") +
+                           (prevEt.length && newEt.length ? ", " : "") +
+                           newEt.join(", ") || "-";
+
+        const sinEntradas = (prevSin.length ? `(${prevSin.join(", ")})` : "") +
+                            (prevSin.length && newSin.length ? ", " : "") +
+                            newSin.join(", ") || "-";
+
+        const div = document.createElement("div");
+        div.style.marginBottom = "10px";
+        div.innerHTML = `
+            <strong>${marca} ${añada}</strong>
+            <div style="display:flex; gap:20px; margin-top:4px;">
+                <div>
+                    <strong>Etiquetado:</strong> ${etEntradas}
+                </div>
+                <div>
+                    <strong>Sin Etiquetar:</strong> ${sinEntradas}
+                </div>
+            </div>
+        `;
+        cont.appendChild(div);
+    });
+}
+
+/* ====== ACTUALIZAR SUMA PARA HISTÓRICO ====== */
+function sumar(e, input, col) {
+    if (e.key === "Enter") {
+        e.preventDefault();
+        const valor = Number(input.value || 0);
+        if (valor <= 0) return;
+
+        const row = input.closest("tr");
+        const target = row.cells[col].querySelector("input");
+
+        target.value = Number(target.value) + valor;
+        input.value = "";
+        actualizarFila(row);
+
+        // Añadir al histórico
+        if (col === 4) actualizarHistorico(row, valor, 'et');
+        else if (col === 6) actualizarHistorico(row, valor, 'sin');
+
+        saveInventory();
+    }
+}
+
+function sumarBlur(input, col) {
+    const valor = Number(input.value || 0);
+    if (valor <= 0) return;
+
+    const row = input.closest("tr");
+    const target = row.cells[col].querySelector("input");
+
+    target.value = Number(target.value) + valor;
+    input.value = "";
+    actualizarFila(row);
+
+    // Añadir al histórico
+    if (col === 4) actualizarHistorico(row, valor, 'et');
+    else if (col === 6) actualizarHistorico(row, valor, 'sin');
+
+    saveInventory();
+}
+
+/* ====== RESET DE FILA (mantener histórico anterior entre paréntesis) ====== */
+function resetFilasSeleccionadas() {
+    document.querySelectorAll("#inventoryTable tbody tr").forEach(row => {
+        const checkbox = row.querySelector(".selectRow");
+        if (checkbox && checkbox.checked) {
+            const rowId = row.dataset.id;
+            if (rowId && historico[rowId]) {
+                // Guardamos las entradas actuales en prevEt / prevSin
+                historico[rowId].prevEt = (historico[rowId].prevEt || []).concat(historico[rowId].et || []);
+                historico[rowId].prevSin = (historico[rowId].prevSin || []).concat(historico[rowId].sin || []);
+                // Limpiamos las nuevas entradas para poder añadir más después
+                historico[rowId].et = [];
+                historico[rowId].sin = [];
+            }
+
+            row.cells[4].querySelector("input").value = "0"; // Etiquetado
+            row.cells[6].querySelector("input").value = "0"; // Sin etiquetar
+            actualizarFila(row);
+            checkbox.checked = false;
+        }
+    });
+    saveInventory();
+    renderHistorico(); // mostrar paréntesis visual
+}
+
+/* ====== ELIMINAR FILA COMPLETA ====== */
+function eliminarFila(row) {
+    const rowId = row.dataset.id;
+    if (rowId && historico[rowId]) delete historico[rowId]; // Borrar histórico de esa fila
+    row.remove();
+    saveInventory();
+    renderHistorico();
+}
+/* ====== ACTUALIZAR MARCA / AÑADA EN HISTÓRICO ====== */
+document.querySelectorAll("#inventoryTable tbody").forEach(tbody => {
+    tbody.addEventListener("change", e => {
+        const row = e.target.closest("tr");
+        if (!row) return;
+        const rowId = row.dataset.id;
+        if (!rowId || !historico[rowId]) return;
+
+        // Actualizamos marca y añada para que el renderHistorico muestre correctamente
+        historico[rowId].marca = row.cells[1].querySelector("select").value;
+        historico[rowId].añada = row.cells[2].querySelector("input").value;
+
+        renderHistorico();
+    });
+});
