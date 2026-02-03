@@ -409,3 +409,46 @@ document.querySelectorAll("#inventoryTable tbody").forEach(tbody => {
         renderHistorico();
     });
 });
+/* ====== EXPORTAR / IMPORTAR COPIA DE SEGURIDAD ====== */
+
+function exportarBackup() {
+    const inventario = localStorage.getItem("inventarioBodega");
+    const historicoData = localStorage.getItem("historicoBodega");
+
+    const backup = {
+        inventario: inventario ? JSON.parse(inventario) : [],
+        historico: historicoData ? JSON.parse(historicoData) : {},
+        fecha: new Date().toISOString()
+    };
+
+    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "backup_inventario_bodega.json";
+    a.click();
+
+    URL.revokeObjectURL(url);
+}
+
+function importarBackup(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const backup = JSON.parse(e.target.result);
+
+            localStorage.setItem("inventarioBodega", JSON.stringify(backup.inventario || []));
+            localStorage.setItem("historicoBodega", JSON.stringify(backup.historico || {}));
+
+            alert("✅ Backup cargado correctamente");
+            location.reload();
+        } catch (err) {
+            alert("❌ Archivo no válido");
+        }
+    };
+    reader.readAsText(file);
+}

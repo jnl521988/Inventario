@@ -284,3 +284,34 @@ input:focus, select:focus {
     color: #333;
     font-weight: 500;
 }
+.import-btn {
+    background: #4CAF50;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: inline-block;
+}
+
+.import-btn:hover {
+    background: #45a049;
+}
+
+button {
+    margin: 4px;
+}
+/* Botón Exportar copia */
+button[onclick="exportarBackup()"] {
+    background: #d78819;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    border: none;
+    font-size: 14px;
+    margin: 4px;
+}
+
+button[onclick="exportarBackup()"]:hover {
+    background: #45a049;
+}

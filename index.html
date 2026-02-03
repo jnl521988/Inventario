@@ -11,12 +11,17 @@
 <section id="paginaPrincipal">
 
     <h1>Inventario de Bodega</h1>
-
     <button onclick="addRow()">➕ Añadir fila</button>
     <button onclick="enviarResumen()">📤 Enviar a resumen</button>
     <button onclick="mostrarResumen()">📊 Ir a resumen</button>
     <button onclick="toggleCalculator()">🧮 Calculadora</button>
     <button onclick="resetFilasSeleccionadas()">♻ Reset filas seleccionadas</button>
+    <button onclick="exportarBackup()">💾 Exportar Datos</button>
+
+<label class="import-btn">
+    📂 Importar Datos
+    <input type="file" accept=".json" onchange="importarBackup(event)" hidden>
+</label>
 
 
     <form id="inventoryForm">
