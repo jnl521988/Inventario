@@ -452,3 +452,16 @@ function importarBackup(event) {
     };
     reader.readAsText(file);
 }
+/* ====== GUARDAR MARCA Y AÑADA AUTOMÁTICAMENTE ====== */
+
+document.addEventListener("change", e => {
+    if (
+        e.target.closest("#inventoryTable") &&
+        (
+            e.target.tagName === "SELECT" ||
+            e.target.type === "number"
+        )
+    ) {
+        saveInventory();
+    }
+});
