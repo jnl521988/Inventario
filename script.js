@@ -19,7 +19,18 @@ document.addEventListener("DOMContentLoaded", () => {
 // addRow acepta un objeto opcional para rellenar valores
 function addRow(data = {}) {
     const tbody = document.querySelector("#inventoryTable tbody");
-    const row = tbody.insertRow();
+
+    // Buscar fila seleccionada
+    const selected = document.querySelector("#inventoryTable tbody .selectRow:checked");
+    
+    let row;
+
+    if (selected) {
+        const currentRow = selected.closest("tr");
+        row = tbody.insertRow(currentRow.rowIndex - 1 + 1);
+    } else {
+        row = tbody.insertRow();
+    }
 
     row.innerHTML = `
         <td><input type="checkbox" class="selectRow"></td>
@@ -101,6 +112,8 @@ function actualizarFila(el) {
     row.cells[8].innerText = et + sin; // Total botellas
     row.cells[9].innerText = ((et + sin) * cap).toFixed(0); // Total litros
     saveInventory();
+
+    aplicarColorFila(row);
 }
 
 /* ====== GUARDADO EN LOCALSTORAGE ====== */
@@ -463,5 +476,51 @@ document.addEventListener("change", e => {
         )
     ) {
         saveInventory();
+    }
+});
+
+/* ====== COLOR POR MARCA ====== */
+
+function aplicarColorFila(row) {
+    const marca = row.cells[1].querySelector("select").value;
+
+    const clases = [
+        "marca-platón",
+        "marca-abracadabra",
+        "marca-madremia",
+        "marca-24-mozas",
+        "marca-encomienda",
+        "marca-loquillo-tinto",
+        "marca-loquillo-verdejo",
+        "marca-el-principito",
+        "marca-vocablos",
+        "marca-divina-proporcion"
+    ];
+
+    row.classList.remove(...clases);
+
+    const map = {
+        "Platón": "marca-platón",
+        "Abracadabra": "marca-abracadabra",
+        "Madremia": "marca-madremia",
+        "24 Mozas": "marca-24-mozas",
+        "Encomienda de la Vega": "marca-encomienda",
+        "Loquillo Tinto": "marca-loquillo-tinto",
+        "Loquillo Verdejo": "marca-loquillo-verdejo",
+        "El Principito": "marca-el-principito",
+        "Vocablos": "marca-vocablos",
+        "Divina Proporción": "marca-divina-proporcion"
+    };
+
+    const clase = map[marca];
+    if (clase) row.classList.add(clase);
+}
+
+/* ====== ACTUALIZAR COLOR AL CAMBIAR MARCA ====== */
+
+document.addEventListener("change", e => {
+    if (e.target.closest("#inventoryTable") && e.target.tagName === "SELECT") {
+        const row = e.target.closest("tr");
+        aplicarColorFila(row);
     }
 });
