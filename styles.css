@@ -340,3 +340,8 @@ button[onclick="exportarBackup()"]:hover {
 .marca-vocablos { background: #ffffff !important; }
 
 .marca-divina-proporcion { background: #ffc1e3 !important; }
+
+.btn-borrar-historico {
+    border: 2px solid red;
+    border-radius: 6px;
+}

@@ -6,6 +6,8 @@ const marcas = [
 
 let resumenData = [];
 
+let rowIdPendiente = null;
+
 /* ====== INVENTARIO ====== */
 // Cargar inventario guardado al iniciar
 document.addEventListener("DOMContentLoaded", () => {
@@ -14,11 +16,18 @@ document.addEventListener("DOMContentLoaded", () => {
         const rows = JSON.parse(saved);
         rows.forEach(r => addRow(r));
     }
+
+    loadHistorico();
 });
 
 // addRow acepta un objeto opcional para rellenar valores
 function addRow(data = {}) {
     const tbody = document.querySelector("#inventoryTable tbody");
+
+        // Recuperar ID si existe (al cargar desde localStorage)
+    if (data.rowId) {
+        rowIdPendiente = data.rowId;
+    }
 
     // Buscar fila seleccionada
     const selected = document.querySelector("#inventoryTable tbody .selectRow:checked");
@@ -66,6 +75,12 @@ function addRow(data = {}) {
             <button onclick="eliminarFila(this.closest('tr'))">❌</button>
         </td>
     `;
+    
+        if (data.rowId) {
+        row.dataset.id = data.rowId;
+    } else {
+        row.dataset.id = Date.now() + "_" + Math.random();
+    }
 
     actualizarFila(row);
     // Guardar inventario después de añadir fila
@@ -120,7 +135,13 @@ function actualizarFila(el) {
 function saveInventory() {
     const data = [];
     document.querySelectorAll("#inventoryTable tbody tr").forEach(r => {
+
+        if (!r.dataset.id) {
+    r.dataset.id = Date.now() + Math.random();
+}
         data.push({
+            id: r.dataset.id,
+            rowId: r.dataset.id,
             marca: r.cells[1].querySelector("select").value,
             añada: r.cells[2].querySelector("input").value,
             et: r.cells[4].querySelector("input").value,
@@ -207,6 +228,7 @@ function resetFilasSeleccionadas() {
         }
     });
     saveInventory();
+    saveHistorico();
 }
 
 function toggleSelectAll(master) {
@@ -289,6 +311,7 @@ function actualizarHistorico(row, valor, tipo) {
     else if (tipo === 'sin') historico[rowId].sin.push(valor);
 
     renderHistorico();
+    saveHistorico();
 }
 
 function renderHistorico() {
@@ -397,6 +420,7 @@ function resetFilasSeleccionadas() {
     });
     saveInventory();
     renderHistorico(); // mostrar paréntesis visual
+    saveHistorico();
 }
 
 /* ====== ELIMINAR FILA COMPLETA ====== */
@@ -406,6 +430,7 @@ function eliminarFila(row) {
     row.remove();
     saveInventory();
     renderHistorico();
+    saveHistorico();
 }
 /* ====== ACTUALIZAR MARCA / AÑADA EN HISTÓRICO ====== */
 document.querySelectorAll("#inventoryTable tbody").forEach(tbody => {
@@ -420,6 +445,7 @@ document.querySelectorAll("#inventoryTable tbody").forEach(tbody => {
         historico[rowId].añada = row.cells[2].querySelector("input").value;
 
         renderHistorico();
+        saveHistorico();
     });
 });
 /* ====== EXPORTAR / IMPORTAR COPIA DE SEGURIDAD ====== */
@@ -524,3 +550,35 @@ document.addEventListener("change", e => {
         aplicarColorFila(row);
     }
 });
+
+/* ====== GUARDAR / CARGAR HISTÓRICO ====== */
+
+function saveHistorico() {
+    localStorage.setItem(
+        "historicoBodega",
+        JSON.stringify(historico)
+        
+    );
+    console.log("Historico guardado:", historico);
+}
+
+function loadHistorico() {
+    const datos = localStorage.getItem("historicoBodega");
+
+    if (datos) {
+        historico = JSON.parse(datos);
+        renderHistorico();
+
+        console.log("Historico cargado:", historico);
+        
+    }
+    
+}
+
+function borrarHistorico() {
+    if (!confirm("¿Borrar todo el histórico?")) return;
+
+    historico = {};
+    localStorage.removeItem("historicoBodega");
+    renderHistorico();
+}
