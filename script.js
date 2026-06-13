@@ -217,6 +217,92 @@ function exportarPDF() {
     window.print();
 }
 
+function exportarVentasPDF() {
+
+    const tabla = document.getElementById("tablaVentas").outerHTML;
+
+    const totalAntes = document.getElementById("totalAntes")?.innerText || "0";
+    const totalDespues = document.getElementById("totalDespues")?.innerText || "0";
+    const totalEmb = document.getElementById("totalEmbotellado")?.innerText || "0";
+    const totalConsumo = document.getElementById("totalConsumo")?.innerText || "0";
+
+    const consumoInfo =
+        document.getElementById("infoConsumoVentas")?.innerHTML || "";
+
+    const ventana = window.open("", "_blank");
+
+    ventana.document.write(`
+        <html>
+        <head>
+            <title>Informe de Ventas</title>
+
+            <style>
+                body{
+                    font-family: Arial, sans-serif;
+                    padding:6px;
+                }
+
+                h1{
+                    text-align:center;
+                    margin-bottom:6px;
+                }
+
+                table{
+                    width:100%;
+                    border-collapse:collapse;
+                }
+
+                th,td{
+                    border:1px solid black;
+                    padding:2px;
+                    text-align:center;
+                }
+
+                th{
+                    background:#f0f0f0;
+                }
+
+                .totales{
+                    font-weight:bold;
+                    margin-top:2px;
+                }
+
+                .consumo{
+                    margin-top:6px;
+                    font-weight:bold;
+                }
+            </style>
+        </head>
+
+        <body>
+
+            <h1>Informe de Ventas</h1>
+
+            ${tabla}
+
+            <div class="totales">
+                <p>Total Antes: ${totalAntes}</p>
+                <p>Total Después: ${totalDespues}</p>
+                <p>Total Embotellado: ${totalEmb}</p>
+                <p>Total Consumo: ${totalConsumo}</p>
+            </div>
+
+            <div class="consumo">
+                ${consumoInfo}
+            </div>
+
+        </body>
+        </html>
+    `);
+
+    ventana.document.close();
+
+    ventana.onload = function () {
+        ventana.print();
+        ventana.close();
+    };
+}
+
 /* ====== RESET FILAS SELECCIONADAS ====== */
 function resetFilasSeleccionadas() {
     document.querySelectorAll("#inventoryTable tbody tr").forEach(row => {

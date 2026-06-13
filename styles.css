@@ -44,7 +44,13 @@ button:hover {
 button:nth-child(1) { background: #27ae60; color: rgb(255, 255, 255); }
 button:nth-child(2) { background: #2980b9; color: white; }
 button:nth-child(3) { background: #8e44ad; color: white; }
-button:nth-child(4) { background: #7f8c8d; color: white; }
+button:nth-child(4) { background: #6a7d7e; color: white; }
+
+.btn-reset{
+    background: linear-gradient(135deg, #d760bb, #d379b1);
+    color: white;
+}
+
 
 /* ===== TABLAS ===== */
 table {
@@ -194,6 +200,11 @@ input:focus, select:focus {
 /* Exportar PDF */
 #paginaResumen button:nth-of-type(3){
   background: linear-gradient(135deg, #6dc471, #66bb6a);
+}
+
+/* Guardar Inventario */
+#paginaResumen button:nth-of-type(4){
+  background: linear-gradient(135deg, #9b5edc, #a95cc8);
 }
 @media print {
     #paginaResumen button {
@@ -383,3 +394,20 @@ button[onclick="exportarBackup()"]:hover {
 .btn-calcular-ventas:hover{
     background-color: #27ae60;
 }
+
+/* ➕ Añadir Fila */
+#paginaVentas button:nth-of-type(4){
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+}
+
+/* 📄 Exportar PDF */
+#paginaVentas button:nth-of-type(5){
+    background: linear-gradient(135deg, #c8a27a, #b08968);
+    color: white;
+}
+
+
+
+
+

@@ -16,7 +16,9 @@
     <button onclick="mostrarResumen()">📊 Ir a Resumen</button>
     <button class="btn-borrar-historico" onclick="borrarHistorico()">🗑️ Borrar Histórico</button>
     <button onclick="toggleCalculator()">🧮 Calculadora</button>
-    <button onclick="resetFilasSeleccionadas()">♻ Reset Filas Seleccionadas</button>
+  <button class="btn-reset" onclick="resetFilasSeleccionadas()">
+    ♻ Reset Filas Seleccionadas
+</button>
     <button onclick="exportarBackup()">💾 Exportar Datos</button>
 
 <label class="import-btn">
@@ -163,6 +165,7 @@
 </table>
 
 <button onclick="addEmbRow()">➕ Añadir Fila</button>
+<button onclick="exportarVentasPDF()">📄 Exportar PDF</button>
 
 <h3>RESULTADO DE VENTAS</h3>
 <table id="tablaVentas">
