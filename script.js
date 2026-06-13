@@ -18,6 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     loadHistorico();
+    cargarEmbotellados();
 });
 
 // addRow acepta un objeto opcional para rellenar valores
@@ -581,4 +582,293 @@ function borrarHistorico() {
     historico = {};
     localStorage.removeItem("historicoBodega");
     renderHistorico();
+}
+
+function guardarInventarioConFecha() {
+    const fecha = document.getElementById("fecha").value;
+
+    if (!fecha) {
+        alert("Selecciona una fecha primero");
+        return;
+    }
+
+    const inventario = JSON.parse(localStorage.getItem("inventarioBodega") || "[]");
+    const snapshots = JSON.parse(localStorage.getItem("snapshotsBodega") || "[]");
+
+    snapshots.push({
+        fecha: fecha,
+        data: inventario
+    });
+
+    localStorage.setItem("snapshotsBodega", JSON.stringify(snapshots));
+
+    alert("Inventario guardado con fecha " + fecha);
+}
+
+function cargarInventariosEnSelect() {
+    const snapshots = JSON.parse(localStorage.getItem("snapshotsBodega") || "[]");
+
+    const selA = document.getElementById("invAnterior");
+    const selB = document.getElementById("invActual");
+
+    if (!selA || !selB) return;
+
+    selA.innerHTML = "";
+    selB.innerHTML = "";
+
+    snapshots.forEach((s, i) => {
+        const opt = document.createElement("option");
+        opt.value = i;
+        opt.textContent = s.fecha;
+
+        selA.appendChild(opt.cloneNode(true));
+        selB.appendChild(opt);
+    });
+}
+
+function calcularVentas() {
+    const snapshots = JSON.parse(localStorage.getItem("snapshotsBodega") || "[]");
+
+    const iA = document.getElementById("invAnterior").value;
+    const iB = document.getElementById("invActual").value;
+
+    const anterior = snapshots[iA]?.data || [];
+    const actual = snapshots[iB]?.data || [];
+
+    const embotellado = obtenerEmbotellado();
+
+    const mapaAnterior = {};
+    const mapaActual = {};
+
+    anterior.forEach(r => {
+        const key = r.marca + "_" + r.añada;
+        mapaAnterior[key] = Number(r.bot);
+    });
+
+    actual.forEach(r => {
+        const key = r.marca + "_" + r.añada;
+        mapaActual[key] = Number(r.bot);
+    });
+
+    const tbody = document.querySelector("#tablaVentas tbody");
+    tbody.innerHTML = "";
+
+    const keys = new Set([
+        ...Object.keys(mapaAnterior),
+        ...Object.keys(mapaActual),
+        ...Object.keys(embotellado)
+    ]);
+
+    // 🔥 TOTALES
+    let totalAntes = 0;
+    let totalDespues = 0;
+    let totalEmbotellado = 0;
+    let totalConsumo = 0;
+
+    keys.forEach(key => {
+        const antes = mapaAnterior[key] || 0;
+        const ahora = mapaActual[key] || 0;
+        const emb = embotellado[key] || 0;
+
+        const consumo = (antes + emb) - ahora;
+
+        const [marca, añada] = key.split("_");
+
+        const row = tbody.insertRow();
+        row.innerHTML = `
+            <td>${marca}</td>
+            <td>${añada}</td>
+            <td>${antes}</td>
+            <td>${ahora}</td>
+            <td>${emb}</td>
+            <td>${consumo}</td>
+        `;
+
+        // 🔥 sumar totales
+        totalAntes += antes;
+        totalDespues += ahora;
+        totalEmbotellado += emb;
+        totalConsumo += consumo;
+    });
+
+    // 🔥 pintar totales en HTML
+    const elAntes = document.getElementById("totalAntes");
+    const elDespues = document.getElementById("totalDespues");
+    const elEmb = document.getElementById("totalEmbotellado");
+    const elConsumo = document.getElementById("totalConsumo");
+
+    if (elAntes) elAntes.innerText = totalAntes;
+    if (elDespues) elDespues.innerText = totalDespues;
+    if (elEmb) elEmb.innerText = totalEmbotellado;
+    if (elConsumo) elConsumo.innerText = totalConsumo;
+
+
+const info = document.getElementById("infoConsumoVentas");
+
+if (info && snapshots[iA] && snapshots[iB]) {
+
+    const fechaAnterior = new Date(snapshots[iA].fecha);
+    const fechaActual = new Date(snapshots[iB].fecha);
+
+    const dias = Math.max(
+        1,
+        Math.round((fechaActual - fechaAnterior) / (1000 * 60 * 60 * 24))
+    );
+
+    const consumoMedio = (totalConsumo / dias).toFixed(0);
+
+    info.innerHTML = `
+        <p><strong>Días Transcurridos:</strong> ${dias}</p>
+        <p><strong>Consumo Medio Diario:</strong> ${consumoMedio} Botellas/Día</p>
+    `;
+}}
+
+function addEmbRow(data = {}) {
+    const tbody = document.querySelector("#tablaEmb tbody");
+    const row = tbody.insertRow();
+
+    row.innerHTML = `
+        <td>
+            <select onchange="guardarEmbotellados()">
+                ${marcas.map(m =>
+                    `<option ${data.marca === m ? "selected" : ""}>${m}</option>`
+                ).join("")}
+            </select>
+        </td>
+
+        <td>
+            <input type="number" value="${data.añada || ""}"
+                   onchange="guardarEmbotellados()">
+        </td>
+
+        <td>
+            <input type="number" value="${data.et || ""}"
+                   onchange="guardarEmbotellados()">
+        </td>
+
+        <td>
+            <input type="number" value="${data.sin || ""}"
+                   onchange="guardarEmbotellados()">
+        </td>
+
+        <td>
+            <button onclick="eliminarEmbRow(this)">❌</button>
+        </td>
+    `;
+}
+
+function eliminarEmbRow(btn) {
+    btn.closest("tr").remove();
+    guardarEmbotellados();
+}
+
+function mostrarPagina(id) {
+    const paginas = ["paginaPrincipal", "paginaResumen", "paginaVentas"];
+
+    paginas.forEach(p => {
+        const el = document.getElementById(p);
+        if (el) el.style.display = "none";
+    });
+
+    const activa = document.getElementById(id);
+    if (activa) {
+        activa.style.display = "block";
+
+        // 👇 ESTO ES LO IMPORTANTE
+        if (id === "paginaVentas") {
+            cargarInventariosEnSelect();
+        }
+    }
+}
+
+function obtenerEmbotellado() {
+    const filas = document.querySelectorAll("#tablaEmb tbody tr");
+
+    const mapa = {};
+
+    filas.forEach(r => {
+        const marca = r.cells[0].querySelector("select").value;
+        const añada = r.cells[1].querySelector("input").value;
+
+        const et = Number(r.cells[2].querySelector("input").value || 0);
+        const sin = Number(r.cells[3].querySelector("input").value || 0);
+
+        const key = marca + "_" + añada;
+
+        if (!mapa[key]) {
+            mapa[key] = 0;
+        }
+
+        mapa[key] += (et + sin);
+    });
+
+    return mapa;
+}
+
+function borrarInventariosGuardados() {
+    let snapshots = JSON.parse(localStorage.getItem("snapshotsBodega") || "[]");
+
+    if (snapshots.length === 0) {
+        alert("No hay inventarios guardados");
+        return;
+    }
+
+    const lista = snapshots.map((s, i) =>
+        `${i}: ${s.fecha}`
+    ).join("\n");
+
+    const index = prompt(
+        "Escribe el número del inventario a borrar:\n\n" +
+        lista +
+        "\n\n(O escribe ALL para borrar todos)"
+    );
+
+    if (index === null) return;
+
+    if (index.toUpperCase() === "ALL") {
+        localStorage.removeItem("snapshotsBodega");
+        alert("Todos los inventarios han sido borrados");
+        cargarInventariosEnSelect();
+        return;
+    }
+
+    const i = Number(index);
+
+    if (isNaN(i) || !snapshots[i]) {
+        alert("Índice no válido");
+        return;
+    }
+
+    snapshots.splice(i, 1);
+
+    localStorage.setItem("snapshotsBodega", JSON.stringify(snapshots));
+
+    alert("Inventario eliminado");
+
+    cargarInventariosEnSelect();
+}
+
+function guardarEmbotellados() {
+    const datos = [];
+
+    document.querySelectorAll("#tablaEmb tbody tr").forEach(row => {
+        datos.push({
+            marca: row.cells[0].querySelector("select").value,
+            añada: row.cells[1].querySelector("input").value,
+            et: row.cells[2].querySelector("input").value,
+            sin: row.cells[3].querySelector("input").value
+        });
+    });
+
+    localStorage.setItem("embotelladosBodega", JSON.stringify(datos));
+}
+
+function cargarEmbotellados() {
+    const datos = JSON.parse(
+        localStorage.getItem("embotelladosBodega") || "[]"
+    );
+
+    datos.forEach(d => {
+        addEmbRow(d);
+    });
 }

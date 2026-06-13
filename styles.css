@@ -345,3 +345,41 @@ button[onclick="exportarBackup()"]:hover {
     border: 2px solid red;
     border-radius: 6px;
 }
+
+.fila-totales{
+    font-weight: bold;
+}
+
+.btn-ventas{
+    border: 2px solid black;
+    border-radius: 6px;
+    font-weight: bold;
+}
+
+.btn-borrar-inventarios{
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+}
+
+.btn-calcular-ventas{
+    background-color: #2ecc71;
+    color: white;
+    border: none;
+}
+
+.btn-borrar-inventarios,
+.btn-calcular-ventas{
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.btn-borrar-inventarios:hover{
+    background-color: #c0392b;
+}
+
+.btn-calcular-ventas:hover{
+    background-color: #27ae60;
+}

@@ -24,6 +24,10 @@
     <input type="file" accept=".json" onchange="importarBackup(event)" hidden>
 </label>
 
+<button class="btn-ventas" onclick="mostrarPagina('paginaVentas')">
+    📈 Ventas
+</button>
+
 
     <form id="inventoryForm">
   <table id="inventoryTable">
@@ -81,6 +85,7 @@
     <button onclick="volverPrincipal()">⬅ Volver</button>
     <button onclick="borrarResumen()">🗑 Borrar datos</button>
     <button onclick="exportarPDF()">📄 Exportar PDF</button>
+    <button onclick="guardarInventarioConFecha()">💾 Guardar Inventario</button>
 
 </section>
 
@@ -117,6 +122,77 @@
         <button class="clear" onclick="clearCalc()">C</button>
     </div>
 </div>
+
+<section id="paginaVentas" style="display:none">
+
+<h1>Ventas</h1>
+
+<button onclick="mostrarPagina('paginaPrincipal')">⬅ Volver</button>
+
+<h3>SELECCIONAR INVENTARIOS</h3>
+
+<label>ANTERIOR:
+    <select id="invAnterior"></select>
+</label>
+
+<label>ACTUAL:
+    <select id="invActual"></select>
+</label>
+
+<button class="btn-borrar-inventarios" onclick="borrarInventariosGuardados()">
+    🗑 Borrar Inventarios Guardados
+</button>
+
+<button class="btn-calcular-ventas" onclick="calcularVentas()">
+    📊 Calcular Ventas
+</button>
+
+<h3>EMBOTELLADOS</h3>
+
+<table id="tablaEmb">
+    <thead>
+        <tr>
+            <th>Marca</th>
+            <th>Añada</th>
+            <th>Etiquetadas</th>
+            <th>Sin Etiquetar</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<button onclick="addEmbRow()">➕ Añadir Fila</button>
+
+<h3>RESULTADO DE VENTAS</h3>
+<table id="tablaVentas">
+    <thead>
+        <tr>
+            <th>Marca</th>
+            <th>Añada</th>
+            <th>Antes</th>
+            <th>Después</th>
+            <th>Embotellado</th>
+            <th>Consumo</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+    <tfoot>
+ <tr class="fila-totales">
+    <td>TOTAL</td>
+    <td></td>
+    <td id="totalAntes"></td>
+    <td id="totalDespues"></td>
+    <td id="totalEmbotellado"></td>
+    <td id="totalConsumo"></td>
+</tr>
+</tfoot>
+</table>
+
+<div id="infoConsumoVentas"></div>
+
+
+</section>
 
 
 <script src="script.js"></script>
