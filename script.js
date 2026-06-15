@@ -297,10 +297,11 @@ function exportarVentasPDF() {
 
     ventana.document.close();
 
-    ventana.onload = function () {
+ventana.onload = function () {
+    setTimeout(() => {
         ventana.print();
-        ventana.close();
-    };
+    }, 1000);
+};
 }
 
 /* ====== RESET FILAS SELECCIONADAS ====== */
