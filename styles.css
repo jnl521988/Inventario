@@ -392,7 +392,7 @@ button[onclick="exportarBackup()"]:hover {
 }
 
 .btn-calcular-ventas:hover{
-    background-color: #27ae60;
+    background-color: #17d365;
 }
 
 /* ➕ Añadir Fila */
@@ -405,6 +405,27 @@ button[onclick="exportarBackup()"]:hover {
 #paginaVentas button:nth-of-type(5){
     background: linear-gradient(135deg, #c8a27a, #b08968);
     color: white;
+}
+
+.periodo-embotellado {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    justify-content: flex-start;
+    margin: -8px 0 12px 0;
+    font-size: 0.85rem;
+}
+
+.periodo-embotellado label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.periodo-embotellado input[type="date"] {
+    font-size: 0.8rem;
+    padding: 2px 6px;
+    height: 28px;
 }
 
 

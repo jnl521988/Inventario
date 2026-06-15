@@ -19,6 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     loadHistorico();
     cargarEmbotellados();
+    cargarPeriodoEmbotellado();
 });
 
 // addRow acepta un objeto opcional para rellenar valores
@@ -959,3 +960,30 @@ function cargarEmbotellados() {
         addEmbRow(d);
     });
 }
+
+function guardarPeriodoEmbotellado() {
+    const periodo = {
+        inicio: document.getElementById("fechaEmbInicio").value,
+        fin: document.getElementById("fechaEmbFin").value
+    };
+
+    localStorage.setItem(
+        "periodoEmbotellado",
+        JSON.stringify(periodo)
+    );
+}
+
+function cargarPeriodoEmbotellado() {
+    const datos = localStorage.getItem("periodoEmbotellado");
+
+    if (!datos) return;
+
+    const periodo = JSON.parse(datos);
+
+    document.getElementById("fechaEmbInicio").value = periodo.inicio || "";
+    document.getElementById("fechaEmbFin").value = periodo.fin || "";
+}
+
+document.getElementById("fechaEmbInicio").addEventListener("change", guardarPeriodoEmbotellado);
+
+document.getElementById("fechaEmbFin").addEventListener("change", guardarPeriodoEmbotellado);
