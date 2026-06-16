@@ -374,7 +374,7 @@ button[onclick="exportarBackup()"]:hover {
 }
 
 .btn-calcular-ventas{
-    background-color: #2ecc71;
+    background-color: #055f2a;
     color: white;
     border: none;
 }
@@ -392,7 +392,7 @@ button[onclick="exportarBackup()"]:hover {
 }
 
 .btn-calcular-ventas:hover{
-    background-color: #17d365;
+    background-color: #208f4e;
 }
 
 /* ➕ Añadir Fila */
@@ -403,7 +403,7 @@ button[onclick="exportarBackup()"]:hover {
 
 /* 📄 Exportar PDF */
 #paginaVentas button:nth-of-type(5){
-    background: linear-gradient(135deg, #c8a27a, #b08968);
+    background: linear-gradient(135deg, #683d0f, #875a34);
     color: white;
 }
 

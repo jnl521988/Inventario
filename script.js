@@ -220,15 +220,13 @@ function exportarPDF() {
 
 function exportarVentasPDF() {
 
-    const tabla = document.getElementById("tablaVentas").outerHTML;
+    const tablaVentas = document.getElementById("tablaVentas").outerHTML;
+    const infoConsumo = document.getElementById("infoConsumoVentas").innerHTML;
 
-    const totalAntes = document.getElementById("totalAntes")?.innerText || "0";
-    const totalDespues = document.getElementById("totalDespues")?.innerText || "0";
-    const totalEmb = document.getElementById("totalEmbotellado")?.innerText || "0";
-    const totalConsumo = document.getElementById("totalConsumo")?.innerText || "0";
+    const tablaEmb = document.getElementById("tablaEmb").outerHTML;
 
-    const consumoInfo =
-        document.getElementById("infoConsumoVentas")?.innerHTML || "";
+    const fechaInicio = document.getElementById("fechaEmbInicio").value || "-";
+    const fechaFin = document.getElementById("fechaEmbFin").value || "-";
 
     const ventana = window.open("", "_blank");
 
@@ -238,59 +236,96 @@ function exportarVentasPDF() {
             <title>Informe de Ventas</title>
 
             <style>
-                body{
+                @page {
+                    size: A4 landscape;
+                    margin: 10mm;
+                }
+
+                body {
                     font-family: Arial, sans-serif;
-                    padding:6px;
+                    margin: 0;
+                    padding: 0;
                 }
 
-                h1{
-                    text-align:center;
-                    margin-bottom:6px;
+                h2 {
+                    text-align: center;
+                    margin: 0 0 15px;
                 }
 
-                table{
-                    width:100%;
-                    border-collapse:collapse;
+                .periodo {
+                    margin-bottom: 15px;
+                    font-size: 14px;
                 }
 
-                th,td{
-                    border:1px solid black;
-                    padding:2px;
-                    text-align:center;
+                table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    table-layout: fixed;
+                    font-size: 11px;
                 }
 
-                th{
-                    background:#f0f0f0;
+                th, td {
+                    border: 1px solid #000;
+                    padding: 5px;
+                    text-align: center;
+                    word-wrap: break-word;
                 }
 
-                .totales{
-                    font-weight:bold;
-                    margin-top:2px;
+                th {
+                    background: #f0f0f0;
                 }
 
-                .consumo{
-                    margin-top:6px;
-                    font-weight:bold;
+                tfoot td {
+                    font-weight: bold;
+                }
+
+                .salto-pagina {
+                    page-break-before: always;
+                }
+
+                #tablaEmb th:last-child,
+                #tablaEmb td:last-child {
+                    display: none;
                 }
             </style>
         </head>
 
         <body>
 
-            <h1>Informe de Ventas</h1>
+            <h2>Informe de Ventas</h2>
 
-            ${tabla}
+            ${tablaVentas}
 
-            <div class="totales">
-                <p>Total Antes: ${totalAntes}</p>
-                <p>Total Después: ${totalDespues}</p>
-                <p>Total Embotellado: ${totalEmb}</p>
-                <p>Total Consumo: ${totalConsumo}</p>
+            <div style="margin-top:20px;">
+                ${infoConsumo}
             </div>
 
-            <div class="consumo">
-                ${consumoInfo}
+            <div class="salto-pagina"></div>
+
+            <h2>Informe de Embotellados</h2>
+
+            <div class="periodo">
+                <strong>Desde:</strong> ${fechaInicio}
+                &nbsp;&nbsp;&nbsp;
+                <strong>Hasta:</strong> ${fechaFin}
             </div>
+
+            ${tablaEmb}
+
+           <style> 
+           #tablaEmb select,
+           #tablaEmb input {
+           border: none;
+           outline: none;
+           background: transparent;
+           width: 100%;
+           appearance: none;
+           -webkit-appearance: none;
+           -moz-appearance: none;
+           text-align: center;
+           font-size: 11px;
+}
+           </style>
 
         </body>
         </html>
@@ -298,11 +333,11 @@ function exportarVentasPDF() {
 
     ventana.document.close();
 
-ventana.onload = function () {
-    setTimeout(() => {
-        ventana.print();
-    }, 1000);
-};
+    ventana.onload = function () {
+        setTimeout(() => {
+            ventana.print();
+        }, 1000);
+    };
 }
 
 /* ====== RESET FILAS SELECCIONADAS ====== */
