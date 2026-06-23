@@ -575,16 +575,37 @@ document.querySelectorAll("#inventoryTable tbody").forEach(tbody => {
 /* ====== EXPORTAR / IMPORTAR COPIA DE SEGURIDAD ====== */
 
 function exportarBackup() {
-    const inventario = localStorage.getItem("inventarioBodega");
-    const historicoData = localStorage.getItem("historicoBodega");
 
     const backup = {
-        inventario: inventario ? JSON.parse(inventario) : [],
-        historico: historicoData ? JSON.parse(historicoData) : {},
+
+        inventario: JSON.parse(
+            localStorage.getItem("inventarioBodega") || "[]"
+        ),
+
+        historico: JSON.parse(
+            localStorage.getItem("historicoBodega") || "{}"
+        ),
+
+        snapshots: JSON.parse(
+            localStorage.getItem("snapshotsBodega") || "[]"
+        ),
+
+        embotellados: JSON.parse(
+            localStorage.getItem("embotelladosBodega") || "[]"
+        ),
+
+        fechaEmbInicio: localStorage.getItem("fechaEmbInicio") || "",
+
+        fechaEmbFin: localStorage.getItem("fechaEmbFin") || "",
+
         fecha: new Date().toISOString()
     };
 
-    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
+    const blob = new Blob(
+        [JSON.stringify(backup, null, 2)],
+        { type: "application/json" }
+    );
+
     const url = URL.createObjectURL(blob);
 
     const a = document.createElement("a");
@@ -596,23 +617,59 @@ function exportarBackup() {
 }
 
 function importarBackup(event) {
+
     const file = event.target.files[0];
     if (!file) return;
 
     const reader = new FileReader();
+
     reader.onload = function(e) {
+
         try {
+
             const backup = JSON.parse(e.target.result);
 
-            localStorage.setItem("inventarioBodega", JSON.stringify(backup.inventario || []));
-            localStorage.setItem("historicoBodega", JSON.stringify(backup.historico || {}));
+            localStorage.setItem(
+                "inventarioBodega",
+                JSON.stringify(backup.inventario || [])
+            );
+
+            localStorage.setItem(
+                "historicoBodega",
+                JSON.stringify(backup.historico || {})
+            );
+
+            localStorage.setItem(
+                "snapshotsBodega",
+                JSON.stringify(backup.snapshots || [])
+            );
+
+            localStorage.setItem(
+                "embotelladosBodega",
+                JSON.stringify(backup.embotellados || [])
+            );
+
+            localStorage.setItem(
+                "fechaEmbInicio",
+                backup.fechaEmbInicio || ""
+            );
+
+            localStorage.setItem(
+                "fechaEmbFin",
+                backup.fechaEmbFin || ""
+            );
 
             alert("✅ Backup cargado correctamente");
+
             location.reload();
+
         } catch (err) {
+
             alert("❌ Archivo no válido");
+
         }
     };
+
     reader.readAsText(file);
 }
 /* ====== GUARDAR MARCA Y AÑADA AUTOMÁTICAMENTE ====== */
