@@ -821,12 +821,12 @@ function calcularVentas() {
     const mapaActual = {};
 
     anterior.forEach(r => {
-        const key = r.marca + "_" + r.añada;
+        const key = r.marca + "_" + r.añada + "_" + r.cap;
         mapaAnterior[key] = Number(r.bot);
     });
 
     actual.forEach(r => {
-        const key = r.marca + "_" + r.añada;
+        const key = r.marca + "_" + r.añada + "_" + r.cap;
         mapaActual[key] = Number(r.bot);
     });
 
@@ -845,24 +845,51 @@ function calcularVentas() {
     let totalEmbotellado = 0;
     let totalConsumo = 0;
 
-    keys.forEach(key => {
+    const capacidadOrden = {
+    "0.5": 0,
+    "0.75": 1,
+    "1.5": 2
+};
+
+const keysOrdenadas = [...keys].sort((a, b) => {
+
+    const [marcaA, añadaA, capA] = a.split("_");
+    const [marcaB, añadaB, capB] = b.split("_");
+
+    // Orden de marcas igual que el desplegable
+    const ordenMarca =
+        marcas.indexOf(marcaA) - marcas.indexOf(marcaB);
+
+    if (ordenMarca !== 0) return ordenMarca;
+
+    // Añada de más antigua a más nueva
+    if (Number(añadaA) !== Number(añadaB)) {
+        return Number(añadaA) - Number(añadaB);
+    }
+
+    // Capacidad: 0.5 -> 0.75 -> 1.5
+    return capacidadOrden[capA] - capacidadOrden[capB];
+});
+
+    keysOrdenadas.forEach(key => {
         const antes = mapaAnterior[key] || 0;
         const ahora = mapaActual[key] || 0;
         const emb = embotellado[key] || 0;
 
         const consumo = (antes + emb) - ahora;
 
-        const [marca, añada] = key.split("_");
+        const [marca, añada, cap] = key.split("_");
 
         const row = tbody.insertRow();
         row.innerHTML = `
-            <td>${marca}</td>
-            <td>${añada}</td>
-            <td>${antes}</td>
-            <td>${ahora}</td>
-            <td>${emb}</td>
-            <td>${consumo}</td>
-        `;
+    <td>${marca}</td>
+    <td>${cap}</td>
+    <td>${añada}</td>
+    <td>${antes}</td>
+    <td>${ahora}</td>
+    <td>${emb}</td>
+    <td>${consumo}</td>
+`;
 
         // 🔥 sumar totales
         totalAntes += antes;
@@ -917,6 +944,14 @@ function addEmbRow(data = {}) {
         </td>
 
         <td>
+    <select onchange="guardarEmbotellados()">
+        <option value="0.5" ${data.cap == 0.5 ? "selected" : ""}>0.5</option>
+        <option value="0.75" ${data.cap == 0.75 || !data.cap ? "selected" : ""}>0.75</option>
+        <option value="1.5" ${data.cap == 1.5 ? "selected" : ""}>1.5</option>
+    </select>
+</td>
+
+        <td>
             <input type="number" value="${data.añada || ""}"
                    onchange="guardarEmbotellados()">
         </td>
@@ -967,13 +1002,14 @@ function obtenerEmbotellado() {
     const mapa = {};
 
     filas.forEach(r => {
-        const marca = r.cells[0].querySelector("select").value;
-        const añada = r.cells[1].querySelector("input").value;
+      const marca = r.cells[0].querySelector("select").value;
+const cap = Number(r.cells[1].querySelector("select").value);
+const añada = r.cells[2].querySelector("input").value;
 
-        const et = Number(r.cells[2].querySelector("input").value || 0);
-        const sin = Number(r.cells[3].querySelector("input").value || 0);
+const et = Number(r.cells[3].querySelector("input").value || 0);
+const sin = Number(r.cells[4].querySelector("input").value || 0);
 
-        const key = marca + "_" + añada;
+const key = marca + "_" + añada + "_" + cap;
 
         if (!mapa[key]) {
             mapa[key] = 0;
@@ -1034,9 +1070,10 @@ function guardarEmbotellados() {
     document.querySelectorAll("#tablaEmb tbody tr").forEach(row => {
         datos.push({
             marca: row.cells[0].querySelector("select").value,
-            añada: row.cells[1].querySelector("input").value,
-            et: row.cells[2].querySelector("input").value,
-            sin: row.cells[3].querySelector("input").value
+            cap: Number(row.cells[1].querySelector("select").value),
+            añada: row.cells[2].querySelector("input").value,
+            et: row.cells[3].querySelector("input").value,
+            sin: row.cells[4].querySelector("input").value
         });
     });
 
