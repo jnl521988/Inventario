@@ -932,9 +932,20 @@ if (info && snapshots[iA] && snapshots[iB]) {
 
 function addEmbRow(data = {}) {
     const tbody = document.querySelector("#tablaEmb tbody");
-    const row = tbody.insertRow();
+
+const seleccionada = tbody.querySelector(".selectEmbRow:checked");
+
+let row;
+
+if (seleccionada) {
+    const filaActual = seleccionada.closest("tr");
+    row = tbody.insertRow(filaActual.rowIndex - 1 + 1);
+} else {
+    row = tbody.insertRow();
+}
 
     row.innerHTML = `
+    <td><input type="checkbox" class="selectEmbRow"></td>
         <td>
             <select onchange="guardarEmbotellados()">
                 ${marcas.map(m =>
@@ -1002,12 +1013,12 @@ function obtenerEmbotellado() {
     const mapa = {};
 
     filas.forEach(r => {
-      const marca = r.cells[0].querySelector("select").value;
-const cap = Number(r.cells[1].querySelector("select").value);
-const añada = r.cells[2].querySelector("input").value;
+      const marca = r.cells[1].querySelector("select").value;
+const cap = Number(r.cells[2].querySelector("select").value);
+const añada = r.cells[3].querySelector("input").value;
 
-const et = Number(r.cells[3].querySelector("input").value || 0);
-const sin = Number(r.cells[4].querySelector("input").value || 0);
+const et = Number(r.cells[4].querySelector("input").value || 0);
+const sin = Number(r.cells[5].querySelector("input").value || 0);
 
 const key = marca + "_" + añada + "_" + cap;
 
@@ -1069,11 +1080,11 @@ function guardarEmbotellados() {
 
     document.querySelectorAll("#tablaEmb tbody tr").forEach(row => {
         datos.push({
-            marca: row.cells[0].querySelector("select").value,
-            cap: Number(row.cells[1].querySelector("select").value),
-            añada: row.cells[2].querySelector("input").value,
-            et: row.cells[3].querySelector("input").value,
-            sin: row.cells[4].querySelector("input").value
+            marca: row.cells[1].querySelector("select").value,
+            cap: Number(row.cells[2].querySelector("select").value),
+            añada: row.cells[3].querySelector("input").value,
+            et: row.cells[4].querySelector("input").value,
+            sin: row.cells[5].querySelector("input").value
         });
     });
 
