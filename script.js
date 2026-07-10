@@ -284,7 +284,10 @@ function exportarVentasPDF() {
                 }
 
                 #tablaEmb th:last-child,
-                #tablaEmb td:last-child {
+                #tablaEmb td:last-child,
+                #tablaEmb th:first-child,
+#tablaEmb td:first-child
+                {
                     display: none;
                 }
             </style>
