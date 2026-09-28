@@ -352,6 +352,10 @@ button[onclick="exportarBackup()"]:hover {
 
 .marca-divina-proporcion { background: #ffc1e3 !important; }
 
+.marca-ancestral {
+    background-color: #fff9c4 !important;
+}
+
 .btn-borrar-historico {
     border: 2px solid red;
     border-radius: 6px;

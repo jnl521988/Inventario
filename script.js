@@ -1,7 +1,7 @@
 const marcas = [
     "Divina Proporción","Platón","Abracadabra","Madremia","24 Mozas",
     "Loquillo Tinto","Encomienda de la Vega","Vocablos",
-    "Loquillo Rosado","Loquillo Verdejo","El Principito"
+    "Loquillo Rosado","Loquillo Verdejo","El Principito","Ancestral"
 ];
 
 let resumenData = [];
@@ -704,7 +704,8 @@ function aplicarColorFila(row) {
         "marca-loquillo-verdejo",
         "marca-el-principito",
         "marca-vocablos",
-        "marca-divina-proporcion"
+        "marca-divina-proporcion",
+        "marca-ancestral"
     ];
 
     row.classList.remove(...clases);
@@ -719,7 +720,8 @@ function aplicarColorFila(row) {
         "Loquillo Verdejo": "marca-loquillo-verdejo",
         "El Principito": "marca-el-principito",
         "Vocablos": "marca-vocablos",
-        "Divina Proporción": "marca-divina-proporcion"
+        "Divina Proporción": "marca-divina-proporcion",
+        "Ancestral": "marca-ancestral"
     };
 
     const clase = map[marca];
