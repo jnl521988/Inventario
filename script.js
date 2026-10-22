@@ -453,6 +453,7 @@ function renderHistorico() {
 
         const marca = row.cells[1].querySelector("select").value;
         const añada = row.cells[2].querySelector("input").value;
+        const capacidad = row.cells[7].querySelector("select").value;
 
         const prevEt = historico[rowId].prevEt || [];
         const prevSin = historico[rowId].prevSin || [];
@@ -470,7 +471,7 @@ function renderHistorico() {
         const div = document.createElement("div");
         div.style.marginBottom = "10px";
         div.innerHTML = `
-            <strong>${marca} ${añada}</strong>
+            <strong>${marca} ${añada} (${capacidad})</strong>
             <div style="display:flex; gap:20px; margin-top:4px;">
                 <div>
                     <strong>Etiquetado:</strong> ${etEntradas}
