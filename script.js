@@ -245,6 +245,9 @@ function exportarVentasPDF() {
                     font-family: Arial, sans-serif;
                     margin: 0;
                     padding: 0;
+
+                    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
                 }
 
                 h2 {
@@ -272,8 +275,14 @@ function exportarVentasPDF() {
                 }
 
                 th {
-                    background: #f0f0f0;
-                }
+    background: #95c185;
+    font-weight: bold;
+}
+
+#tablaVentas tfoot td {
+    background: #cf8368;
+    font-weight: bold;
+}
 
                 tfoot td {
                     font-weight: bold;
@@ -471,7 +480,7 @@ function renderHistorico() {
         const div = document.createElement("div");
         div.style.marginBottom = "10px";
         div.innerHTML = `
-            <strong>${marca} ${añada} (${capacidad})</strong>
+            <strong>${marca} ${añada} (${capacidad} L)</strong>
             <div style="display:flex; gap:20px; margin-top:4px;">
                 <div>
                     <strong>Etiquetado:</strong> ${etEntradas}
